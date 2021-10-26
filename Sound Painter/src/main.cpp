@@ -3,6 +3,7 @@
 #include <map>
 #include <fstream>
 #include <SDL\SDL.h>
+#include <string>
 
 #include "Helpers.h"
 
@@ -10,6 +11,7 @@
 #undef main
 int main()
 {
+	srand(time_t(0));
 	SDL_Init(SDL_INIT_EVERYTHING);
 
 	int w = 1280;
@@ -34,10 +36,28 @@ int main()
 			if (events.key.keysym.scancode == SDL_SCANCODE_S)
 			{
 				//save routine
-				double lowFrq = 27.5; //a0
-				double highFrq = 4096; //roughly c8
+				double lowFrq = 20;
+				double highFrq = 20e3;
+				double dbFloor = 96;
 
+				double lnLow = log(lowFrq);
+				double lnHigh = log(highFrq);			
+				
+				std::string name = std::to_string(rand()) + std::to_string(rand())+".txt";
+				std::ofstream out(name);
+				out << "spectrum\n30\n";
+				
+				for (auto& it : pointMap)
+				{
+					double x = it.first;
+					double y = it.second;
 
+					double frq = exp(lnLow + x / w * (lnHigh - lnLow));
+					//double intensity = y / h;
+					double intensity = -dbFloor*y / h;
+
+					out << frq << " " << intensity << "\n";
+				}
 			}
 			if (events.key.keysym.scancode == SDL_SCANCODE_C)
 			{
