@@ -21,6 +21,7 @@ int main()
 
 	std::vector<SDL_Point> points;
 
+	bool mouseButtonDown = false;
 	while (true)
 	{
 		SDL_Event events;
@@ -37,17 +38,25 @@ int main()
 				points.clear();
 			}
 
-			//if (events.type == SDL_MOUSEMOTION) this->onMouseMotion();
+			
 			if (events.type == SDL_MOUSEBUTTONDOWN)  //mouse click
 			{
+				
 				auto button = events.button.button;
+				if (button == SDL_BUTTON_LEFT) mouseButtonDown = true;
+			}
+
+			if (events.type == SDL_MOUSEMOTION && mouseButtonDown)
+			{
 				int x, y;
 				SDL_GetMouseState(&x, &y);
+				points.emplace_back(SDL_Point{ x,y });
+			}
 
-				if (button == SDL_BUTTON_LEFT)
-				{
-					points.emplace_back(SDL_Point{ x,y });
-				}
+			if (events.type == SDL_MOUSEBUTTONUP)
+			{
+				auto button = events.button.button;
+				if (button == SDL_BUTTON_LEFT) mouseButtonDown = false;
 			}
 			
 			if (events.key.keysym.scancode == SDL_SCANCODE_ESCAPE) exit(-1);
