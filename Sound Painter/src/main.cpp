@@ -45,7 +45,7 @@ int main()
 				
 				std::string name = std::to_string(rand()) + std::to_string(rand())+".txt";
 				std::ofstream out(name);
-				out << "spectrum\n30\n";
+				out << "spectrum\n60\n";
 				
 				for (auto& it : pointMap)
 				{
