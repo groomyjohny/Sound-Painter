@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <map>
+#include <fstream>
 #include <SDL\SDL.h>
 
 #include "Helpers.h"
@@ -20,6 +22,7 @@ int main()
 	SDL_CreateWindowAndRenderer(w, h, 0, &wnd, &rend);
 
 	std::vector<SDL_Point> points;
+	std::map<int, int> pointMap;
 
 	bool mouseButtonDown = false;
 	while (true)
@@ -31,11 +34,15 @@ int main()
 			if (events.key.keysym.scancode == SDL_SCANCODE_S)
 			{
 				//save routine
+				double lowFrq = 27.5; //a0
+				double highFrq = 4096; //roughly c8
+
+
 			}
 			if (events.key.keysym.scancode == SDL_SCANCODE_C)
 			{
 				//clear routine
-				points.clear();
+				pointMap.clear();
 			}
 
 			
@@ -50,7 +57,7 @@ int main()
 			{
 				int x, y;
 				SDL_GetMouseState(&x, &y);
-				points.emplace_back(SDL_Point{ x,y });
+				pointMap[x] = y;
 			}
 
 			if (events.type == SDL_MOUSEBUTTONUP)
@@ -63,6 +70,9 @@ int main()
 		}
 
 		SDL_SetRenderDrawColor(rend, 0, 0, 0, SDL_ALPHA_OPAQUE);
+
+		points.clear();
+		for (auto& it : pointMap) points.emplace_back(SDL_Point{ it.first,it.second });
 		if (!points.empty()) SDL_RenderDrawLines(rend, &points.front(), points.size());
 		//frame rendering goes here
 		SDL_RenderPresent(rend);
