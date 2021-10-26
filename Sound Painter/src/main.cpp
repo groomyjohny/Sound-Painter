@@ -43,8 +43,12 @@ int main()
 				double lnLow = log(lowFrq);
 				double lnHigh = log(highFrq);			
 				
-				std::string name = std::to_string(rand()) + std::to_string(rand())+".txt";
-				std::ofstream out(name);
+				std::string name;
+				std::string chars[2] = { "bcdfghjklmnpqrstvwxyz", "aeiou" };
+				for (int i = 0; i < 10; ++i) name += chars[i % 2][rand() % chars[i % 2].size()];
+
+				//SDL_SaveBMP(SDL_GetWindowSurface(wnd), std::string(name+".bmp").c_str()); //save image
+				std::ofstream out(name+".txt");
 				out << "spectrum\n60\n";
 				
 				for (auto& it : pointMap)
