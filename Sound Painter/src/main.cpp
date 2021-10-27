@@ -75,7 +75,7 @@ int main()
 			if (events.key.keysym.scancode == SDL_SCANCODE_C)
 			{
 				//clear routine
-				pointMap.clear();
+				points.clear();
 			}
 
 			
@@ -90,7 +90,7 @@ int main()
 			{
 				int x, y;
 				SDL_GetMouseState(&x, &y);
-				pointMap[x] = y;
+				points.emplace_back(SDL_Point{ x,y });
 			}
 
 			if (events.type == SDL_MOUSEBUTTONUP)
@@ -104,8 +104,8 @@ int main()
 
 		SDL_SetRenderDrawColor(rend, 0, 0, 0, SDL_ALPHA_OPAQUE);
 
-		points.clear();
-		for (auto& it : pointMap) points.emplace_back(SDL_Point{ it.first,it.second });
+		/*points.clear();
+		for (auto& it : pointMap) points.emplace_back(SDL_Point{ it.first,it.second });*/
 		if (!points.empty()) SDL_RenderDrawLines(rend, &points.front(), points.size());
 		//frame rendering goes here
 		SDL_RenderPresent(rend);
