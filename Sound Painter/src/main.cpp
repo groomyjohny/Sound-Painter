@@ -54,10 +54,10 @@ int main()
 				std::ofstream out(txtName);
 				out << "spectrum\n60\n";
 				
-				for (auto& it : pointMap)
+				for (auto& it : points)
 				{
-					double x = it.first;
-					double y = it.second;
+					double x = it.x;
+					double y = it.y;
 
 					double frq = exp(lnLow + x / w * (lnHigh - lnLow));
 					//double intensity = y / h;
