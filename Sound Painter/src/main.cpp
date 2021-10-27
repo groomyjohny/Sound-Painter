@@ -4,14 +4,16 @@
 #include <fstream>
 #include <SDL\SDL.h>
 #include <string>
+#include <ctime>
 
+#include "Mixer.h"
 #include "Helpers.h"
 
 #pragma comment(lib,"SDL2.lib")
 #undef main
 int main()
 {
-	srand(time_t(0));
+	srand(time(0));
 	SDL_Init(SDL_INIT_EVERYTHING);
 
 	int w = 1280;
@@ -48,7 +50,8 @@ int main()
 				for (int i = 0; i < 10; ++i) name += chars[i % 2][rand() % chars[i % 2].size()];
 
 				//SDL_SaveBMP(SDL_GetWindowSurface(wnd), std::string(name+".bmp").c_str()); //save image
-				std::ofstream out(name+".txt");
+				std::string txtName = name + ".txt";
+				std::ofstream out(txtName);
 				out << "spectrum\n60\n";
 				
 				for (auto& it : pointMap)
@@ -62,6 +65,12 @@ int main()
 
 					out << frq << " " << intensity << "\n";
 				}
+
+				out.close();
+
+				Mixer mx(txtName);
+				std::string wavName = name + ".wav";
+				mx.saveToFile(wavName);
 			}
 			if (events.key.keysym.scancode == SDL_SCANCODE_C)
 			{
