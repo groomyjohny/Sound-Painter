@@ -106,7 +106,7 @@ int main()
 
 		/*points.clear();
 		for (auto& it : pointMap) points.emplace_back(SDL_Point{ it.first,it.second });*/
-		if (!points.empty()) SDL_RenderDrawLines(rend, &points.front(), points.size());
+		if (!points.empty()) SDL_RenderDrawPoints(rend, &points.front(), points.size());
 		//frame rendering goes here
 		SDL_RenderPresent(rend);
 
