@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <SDL/SDL.h>
 
 struct Event
 {
@@ -16,7 +17,11 @@ public:
 	double getSample(double t);
 	double getDuration();
 
+	
+	std::vector<float> getSamplesFromUntil(double tBegin, double tEnd, SDL_AudioSpec spec);
 	void saveToFile(std::string name);
+	void clear();
+	void addEvent(const Event& evt);
 private:
 	std::vector<Event> events;
 	std::vector<size_t> currActiveEventIndices;

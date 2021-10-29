@@ -6,11 +6,35 @@
 #include <string>
 #include <ctime>
 
+#include <adm/Timer.h>
 #include "Mixer.h"
 #include "Helpers.h"
 
 #pragma comment(lib,"SDL2.lib")
 #undef main
+
+double lowFrq = 20;
+double highFrq = 20e3;
+double dbFloor = 96;
+
+double lnLow = log(lowFrq);
+double lnHigh = log(highFrq);
+
+double AUDIO_BUFFER_DURATION = 0.1;
+
+Event mousePosToEvent(int x, int y, int w, int h)
+{
+	Event ret;
+	double frq = exp(lnLow + double(x) / w * (lnHigh - lnLow));
+	double db = -dbFloor * double(y) / h;
+
+	ret.tBegin = -1;
+	ret.tEnd = -1;
+	ret.frequency = frq;
+	ret.amplitude = pow(10, db / 10);
+	return ret;
+}
+
 int main()
 {
 	srand(time(0));
@@ -32,6 +56,21 @@ int main()
 	int error = SDL_GL_SetSwapInterval(1);
 	std::cout << "Failed to set vsync: " << SDL_GetError() << "\n";
 
+	SDL_AudioSpec desired,obtained;
+	desired.freq = 44100;
+	desired.format = AUDIO_F32SYS;
+	desired.channels = 1;
+	desired.samples = 512;
+	desired.userdata = 0;
+	desired.callback = 0;
+	//int openAudioError = SDL_OpenAudio(&desired, &obtained);
+	SDL_AudioDeviceID audioDeviceId = SDL_OpenAudioDevice(nullptr, 0, &desired, &obtained, SDL_AUDIO_ALLOW_FORMAT_CHANGE);
+	//SDL_QueueAudio(dev, buf.data(), sizeof(float) * buf.size());
+
+	Mixer mixer;
+	adm::Timer timer;
+	std::vector<float> audioBuffer;
+
 	while (true)
 	{
 		SDL_Event events;
@@ -41,12 +80,7 @@ int main()
 			if (events.key.keysym.scancode == SDL_SCANCODE_S)
 			{
 				//save routine
-				double lowFrq = 20;
-				double highFrq = 20e3;
-				double dbFloor = 96;
-
-				double lnLow = log(lowFrq);
-				double lnHigh = log(highFrq);			
+							
 				
 				std::string name;
 				std::string chars[2] = { "bcdfghjklmnpqrstvwxyz", "aeiou" };
@@ -62,8 +96,7 @@ int main()
 					double x = it.x;
 					double y = it.y;
 
-					double frq = exp(lnLow + x / w * (lnHigh - lnLow));
-					//double intensity = y / h;
+					double frq = exp(lnLow + x / w * (lnHigh - lnLow));					
 					double intensity = -dbFloor*y / h;
 
 					out << frq << " " << intensity << "\n";
@@ -79,6 +112,7 @@ int main()
 			{
 				//clear routine
 				points.clear();
+				mixer.clear();
 			}
 
 			
@@ -94,6 +128,8 @@ int main()
 				int x, y;
 				SDL_GetMouseState(&x, &y);
 				points.emplace_back(SDL_Point{ x,y });
+
+				mixer.addEvent(mousePosToEvent(x, y, w, h));
 			}
 
 			if (events.type == SDL_MOUSEBUTTONUP)
@@ -109,6 +145,11 @@ int main()
 
 		SDL_SetRenderDrawColor(rend, 0, 0, 0, SDL_ALPHA_OPAQUE);
 
+		SDL_ClearQueuedAudio(audioDeviceId);
+		double currT = timer.getTime();
+		audioBuffer = mixer.getSamplesFromUntil(currT, currT + AUDIO_BUFFER_DURATION, obtained);
+		SDL_QueueAudio(audioDeviceId, (void*)&audioBuffer.front(), sizeof(float)*audioBuffer.size());
+		SDL_PauseAudioDevice(audioDeviceId, 0);
 		/*points.clear();
 		for (auto& it : pointMap) points.emplace_back(SDL_Point{ it.first,it.second });*/
 		if (!points.empty()) SDL_RenderDrawPoints(rend, &points.front(), points.size());

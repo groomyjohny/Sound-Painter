@@ -73,6 +73,26 @@ void Mixer::saveToFile(std::string name)
 	}
 	f.close();
 }
+void Mixer::clear()
+{
+	events.clear();
+	currActiveEventIndices.clear();
+}
+void Mixer::addEvent(const Event & evt)
+{
+	events.emplace_back(evt);
+}
+std::vector<float> Mixer::getSamplesFromUntil(double tBegin, double tEnd, SDL_AudioSpec spec)
+{
+	std::vector<float> ret;
+	double secPerCycle = 1.0/spec.freq;
+
+	for (double t = tBegin; t < tEnd; t += secPerCycle)
+	{
+		ret.push_back(this->getSample(t));
+	}
+	return ret;
+}
 Mixer::Mixer(const std::string & path)
 {
 	std::ifstream inp(path);
@@ -177,7 +197,7 @@ void Mixer::advanceTimeTo(const double t)
 	for (int i = 0; i < currActiveEventIndices.size(); ++i) //remove expired events
 	{
 		size_t ind = currActiveEventIndices[i];
-		if (events[ind].tEnd <= t)
+		if (events[ind].tEnd <= t && events[ind].tEnd != -1)
 		{
 			currActiveEventIndices.erase(currActiveEventIndices.begin() + i);
 			--i;
