@@ -21,6 +21,8 @@ double lnLow = log(lowFrq);
 double lnHigh = log(highFrq);
 
 double AUDIO_BUFFER_DURATION = 0.1;
+adm::Timer TIMER(false);
+Mixer MIXER;
 
 Event mousePosToEvent(int x, int y, int w, int h)
 {
@@ -35,6 +37,16 @@ Event mousePosToEvent(int x, int y, int w, int h)
 	return ret;
 }
 
+void fill_audio(void *udata, Uint8 *stream, int len)
+{
+	double t = TIMER.getTime();
+	double cycleTime = 1.0 / 48000;
+	for (int i = 0; i < len; ++i)
+	{
+		((float*)(stream))[i] = MIXER.getSample(t);
+		t += cycleTime;
+	}
+}
 int main()
 {
 	srand(time(0));
@@ -62,13 +74,14 @@ int main()
 	desired.channels = 1;
 	desired.samples = 512;
 	desired.userdata = 0;
-	desired.callback = 0;
+	desired.callback = fill_audio;
+
 	//int openAudioError = SDL_OpenAudio(&desired, &obtained);
 	SDL_AudioDeviceID audioDeviceId = SDL_OpenAudioDevice(nullptr, 0, &desired, &obtained, SDL_AUDIO_ALLOW_FORMAT_CHANGE);
 	//SDL_QueueAudio(dev, buf.data(), sizeof(float) * buf.size());
 
-	Mixer mixer;
-	adm::Timer timer;
+		
+	TIMER.resume();
 	std::vector<float> audioBuffer;
 
 	while (true)
@@ -112,7 +125,7 @@ int main()
 			{
 				//clear routine
 				points.clear();
-				mixer.clear();
+				MIXER.clear();
 			}
 
 			
@@ -129,7 +142,7 @@ int main()
 				SDL_GetMouseState(&x, &y);
 				points.emplace_back(SDL_Point{ x,y });
 
-				mixer.addEvent(mousePosToEvent(x, y, w, h));
+				MIXER.addEvent(mousePosToEvent(x, y, w, h));
 			}
 
 			if (events.type == SDL_MOUSEBUTTONUP)
@@ -145,10 +158,10 @@ int main()
 
 		SDL_SetRenderDrawColor(rend, 0, 0, 0, SDL_ALPHA_OPAQUE);
 
-		SDL_ClearQueuedAudio(audioDeviceId);
-		double currT = timer.getTime();
-		audioBuffer = mixer.getSamplesFromUntil(currT, currT + AUDIO_BUFFER_DURATION, obtained);
-		SDL_QueueAudio(audioDeviceId, (void*)&audioBuffer.front(), sizeof(float)*audioBuffer.size());
+		//SDL_ClearQueuedAudio(audioDeviceId);
+		//double currT = timer.getTime();
+		//audioBuffer = MIXER.getSamplesFromUntil(currT, currT + AUDIO_BUFFER_DURATION, obtained);
+		//SDL_QueueAudio(audioDeviceId, (void*)&audioBuffer.front(), sizeof(float)*audioBuffer.size());
 		SDL_PauseAudioDevice(audioDeviceId, 0);
 		/*points.clear();
 		for (auto& it : pointMap) points.emplace_back(SDL_Point{ it.first,it.second });*/
