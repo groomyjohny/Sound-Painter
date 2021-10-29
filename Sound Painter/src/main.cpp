@@ -29,6 +29,9 @@ int main()
 	std::map<int, int> pointMap;
 
 	bool mouseButtonDown = false;
+	int error = SDL_GL_SetSwapInterval(1);
+	std::cout << "Failed to set vsync: " << SDL_GetError() << "\n";
+
 	while (true)
 	{
 		SDL_Event events;
@@ -52,7 +55,7 @@ int main()
 				//SDL_SaveBMP(SDL_GetWindowSurface(wnd), std::string(name+".bmp").c_str()); //save image
 				std::string txtName = name + ".txt";
 				std::ofstream out(txtName);
-				out << "spectrum\n60\n";
+				out << "spectrum\n20\n";
 				
 				for (auto& it : points)
 				{
@@ -99,7 +102,9 @@ int main()
 				if (button == SDL_BUTTON_LEFT) mouseButtonDown = false;
 			}
 			
-			if (events.key.keysym.scancode == SDL_SCANCODE_ESCAPE) exit(-1);
+			if (events.key.keysym.scancode == SDL_SCANCODE_ESCAPE) SDL_Quit();
+
+			if (events.type == SDL_QUIT) SDL_Quit();
 		}
 
 		SDL_SetRenderDrawColor(rend, 0, 0, 0, SDL_ALPHA_OPAQUE);
