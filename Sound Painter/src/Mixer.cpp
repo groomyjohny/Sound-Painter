@@ -144,18 +144,24 @@ double Mixer::sinWave(double fundamentalHz, double t, int harmonicCount)
 	return acc / maxVol;
 }
 
+double pureSinWave(double fundamentalHz, double t)
+{
+	return sin(2 * PI*fundamentalHz*t);
+}
+
 double Mixer::getSample(double t)
 {
 	this->advanceTimeTo(t);
 	if (currActiveEventIndices.empty()) return 0;
 
 	double sum = 0;
+	double maxAmplitude = 0;
 	for (auto i : currActiveEventIndices)
 	{
-		//sum += Helpers::smoothTanWave(events[i].frequency, t, 1) * events[i].amplitude;
-		sum += sinWave(events[i].frequency, t, 1) * events[i].amplitude;
+		sum += pureSinWave(events[i].frequency, t) * events[i].amplitude;
+		maxAmplitude += events[i].amplitude;
 	}
-	return sum / std::accumulate(currActiveEventIndices.begin(), currActiveEventIndices.end(), 0.0, [&](double acc, size_t i) {return acc + events[i].amplitude; });
+	return sum / maxAmplitude;
 }
 
 double Mixer::getDuration()
@@ -181,13 +187,9 @@ void Mixer::advanceTimeTo(const double t)
 	for (; lastStartedInd < events.size(); ++lastStartedInd)
 	{
 		Event& e = events[lastStartedInd];
-		if (e.tBegin <= t && e.tEnd > t)
+		if (e.tBegin <= t && e.tEnd > t || e.tBegin == -1 || e.tEnd == -1)
 		{
 			currActiveEventIndices.push_back(lastStartedInd);
-		}
-		if (e.tBegin > t)
-		{
-			break;
 		}
 	}
 }
