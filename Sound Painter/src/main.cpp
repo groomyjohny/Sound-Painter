@@ -21,6 +21,8 @@ double lnLow = log(lowFrq);
 double lnHigh = log(highFrq);
 
 double AUDIO_BUFFER_DURATION = 0.1;
+const double AUDIO_BUFFER_SAMPLES = 512;
+const int AUDIO_BUFFER_RATE = 44100;
 adm::Timer TIMER(false);
 Mixer MIXER;
 
@@ -40,8 +42,8 @@ Event mousePosToEvent(int x, int y, int w, int h)
 void fill_audio(void *udata, Uint8 *stream, int len)
 {
 	double t = TIMER.getTime();
-	double cycleTime = 1.0 / 48000;
-	for (int i = 0; i < len; ++i)
+	double cycleTime = 1.0 / AUDIO_BUFFER_RATE;
+	for (int i = 0; i < len/sizeof(float); ++i)
 	{
 		((float*)(stream))[i] = MIXER.getSample(t);
 		t += cycleTime;
@@ -69,10 +71,10 @@ int main()
 	std::cout << "Failed to set vsync: " << SDL_GetError() << "\n";
 
 	SDL_AudioSpec desired,obtained;
-	desired.freq = 44100;
+	desired.freq = AUDIO_BUFFER_RATE;
 	desired.format = AUDIO_F32SYS;
 	desired.channels = 1;
-	desired.samples = 512;
+	desired.samples = AUDIO_BUFFER_DURATION;
 	desired.userdata = 0;
 	desired.callback = fill_audio;
 
@@ -151,9 +153,9 @@ int main()
 				if (button == SDL_BUTTON_LEFT) mouseButtonDown = false;
 			}
 			
-			if (events.key.keysym.scancode == SDL_SCANCODE_ESCAPE) SDL_Quit();
+			if (events.key.keysym.scancode == SDL_SCANCODE_ESCAPE) exit(-1);
 
-			if (events.type == SDL_QUIT) SDL_Quit();
+			if (events.type == SDL_QUIT) exit(-1);
 		}
 
 		SDL_SetRenderDrawColor(rend, 0, 0, 0, SDL_ALPHA_OPAQUE);
