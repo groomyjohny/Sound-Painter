@@ -21,12 +21,18 @@
     <ClCompile Include="src\Mixer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\MixerEvent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Helpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Mixer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MixerEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

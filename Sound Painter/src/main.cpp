@@ -26,17 +26,13 @@ const int AUDIO_BUFFER_RATE = 44100;
 adm::Timer TIMER(false);
 Mixer MIXER;
 
-Event mousePosToEvent(int x, int y, int w, int h)
+std::array<double, MixerEvent::LOOKUP_TABLE_SAMPLES> MixerEvent::lookupTable;
+
+MixerEvent mousePosToEvent(int x, int y, int w, int h)
 {
-	Event ret;
 	double frq = exp(lnLow + double(x) / w * (lnHigh - lnLow));
 	double db = -dbFloor * double(y) / h;
-
-	ret.tBegin = -1;
-	ret.tEnd = -1;
-	ret.frequency = frq;
-	ret.amplitude = pow(10, db / 10);
-	return ret;
+	return MixerEvent(frq, pow(10, db / 10));
 }
 
 void fill_audio(void *udata, Uint8 *stream, int len)
@@ -49,8 +45,20 @@ void fill_audio(void *udata, Uint8 *stream, int len)
 		t += cycleTime;
 	}
 }
+
 int main()
 {
+	
+	for (int i = 0; i < MixerEvent::LOOKUP_TABLE_SAMPLES; ++i)
+	{
+		MixerEvent::lookupTable[i] = sin(2 * M_PI*double(i) / MixerEvent::LOOKUP_TABLE_SAMPLES);
+	}
+
+	/*
+	std::ofstream fss("test.csv");
+	for (auto it : MixerEvent::lookupTable) fss << it << "\n";
+	fss.close();*/
+	
 	srand(time(0));
 	SDL_Init(SDL_INIT_EVERYTHING);
 
@@ -82,7 +90,6 @@ int main()
 	SDL_AudioDeviceID audioDeviceId = SDL_OpenAudioDevice(nullptr, 0, &desired, &obtained, SDL_AUDIO_ALLOW_FORMAT_CHANGE);
 	//SDL_QueueAudio(dev, buf.data(), sizeof(float) * buf.size());
 
-		
 	TIMER.resume();
 	std::vector<float> audioBuffer;
 
@@ -92,44 +99,22 @@ int main()
 		while (SDL_PollEvent(&events))
 		{
 			//input processing goes here
-			if (events.key.keysym.scancode == SDL_SCANCODE_S)
-			{
-				//save routine
-							
-				
+			if (events.key.keysym.scancode == SDL_SCANCODE_S) //save routine
+			{				
 				std::string name;
 				std::string chars[2] = { "bcdfghjklmnpqrstvwxyz", "aeiou" };
 				for (int i = 0; i < 10; ++i) name += chars[i % 2][rand() % chars[i % 2].size()];
-
-				//SDL_SaveBMP(SDL_GetWindowSurface(wnd), std::string(name+".bmp").c_str()); //save image
-				std::string txtName = name + ".txt";
-				std::ofstream out(txtName);
-				out << "spectrum\n20\n";
-				
-				for (auto& it : points)
-				{
-					double x = it.x;
-					double y = it.y;
-
-					double frq = exp(lnLow + x / w * (lnHigh - lnLow));					
-					double intensity = -dbFloor*y / h;
-
-					out << frq << " " << intensity << "\n";
-				}
-
-				out.close();
-
-				Mixer mx(txtName);
-				std::string wavName = name + ".wav";
-				mx.saveToFile(wavName);
+			
+				MIXER.saveSpectrumToFile(name + ".txt");
+				MIXER.saveSoundToFile(name + ".wav");				
 			}
+
 			if (events.key.keysym.scancode == SDL_SCANCODE_C)
 			{
 				//clear routine
 				points.clear();
 				MIXER.clear();
 			}
-
 			
 			if (events.type == SDL_MOUSEBUTTONDOWN)  //mouse click
 			{
