@@ -21,7 +21,7 @@ double lnLow = log(lowFrq);
 double lnHigh = log(highFrq);
 
 double AUDIO_BUFFER_DURATION = 0.1;
-const double AUDIO_BUFFER_SAMPLES = 512;
+const int AUDIO_BUFFER_SAMPLES = 512;
 const int AUDIO_BUFFER_RATE = 44100;
 adm::Timer TIMER(false);
 Mixer MIXER;
@@ -104,6 +104,7 @@ int main()
 				std::string name;
 				std::string chars[2] = { "bcdfghjklmnpqrstvwxyz", "aeiou" };
 				for (int i = 0; i < 10; ++i) name += chars[i % 2][rand() % chars[i % 2].size()];
+				name = "output/" + name;
 			
 				MIXER.saveSpectrumToFile(name + ".txt");
 				MIXER.saveSoundToFile(name + ".wav");				
