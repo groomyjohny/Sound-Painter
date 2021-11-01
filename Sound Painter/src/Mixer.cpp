@@ -105,6 +105,17 @@ std::vector<float> Mixer::getSamplesFromUntil(double tBegin, double tEnd, SDL_Au
 	return ret;
 }
 
+Mixer::Mixer(std::string fileName)
+{
+	std::ifstream f(fileName);
+	double frq, db;
+	while (f >> frq >> db)
+	{
+		MixerEvent evt(frq, pow(10, db / 10));
+		this->addEvent(evt);
+	}
+}
+
 double Mixer::getSample(double t)
 {
 	if (events.empty()) return 0;
@@ -122,4 +133,9 @@ double Mixer::getSample(double t)
 double Mixer::getDuration()
 {
 	return FILE_EXPORT_DURATION;
+}
+
+size_t Mixer::getEventCount()
+{
+	return events.size();
 }

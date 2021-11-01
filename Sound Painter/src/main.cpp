@@ -117,6 +117,30 @@ int main()
 				MIXER.clear();
 			}
 			
+			if (events.key.keysym.scancode == SDL_SCANCODE_B)
+			{
+				std::cout << "Running benchmark...\n";
+				Mixer benchmarkMixer("benchmark.txt");
+				double t = 0;
+				int samples = 44100 * 3;
+				std::vector<double> v(samples);
+				adm::Timer benchmarkTimer;
+				for (int i = 0; i < samples; ++i)
+				{
+					v[i] = benchmarkMixer.getSample(t);
+					t += 1.0 / 44100;
+				}
+				double runTime = benchmarkTimer.getTime();
+
+				size_t sDiff = benchmarkMixer.getEventCount();
+				size_t bDiff = sDiff * samples;
+				//std::cout << v[0] << "\n";
+				double sampleSpeed = samples / runTime;
+				double pointSpeed = bDiff / runTime;
+				std::cout << "Generated " << samples << " samples in " << runTime << " sec (" << sampleSpeed << "/s, " << sampleSpeed/44100 << "x real time @ 44100 Hz" << ")\n";
+				std::cout << "Sample difficulty: " << sDiff << "\nTotal: " << bDiff << " points (" << pointSpeed << "/s)\n\n";
+			}
+
 			if (events.type == SDL_MOUSEBUTTONDOWN)  //mouse click
 			{
 				
