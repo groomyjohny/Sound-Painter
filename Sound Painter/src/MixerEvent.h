@@ -10,9 +10,6 @@ public:
 	double getFrequency();
 	double getAmplitude();
 	double getDbAmplitude();
-
-	static const int LOOKUP_TABLE_SAMPLES = 65536;
-	static std::array<double, LOOKUP_TABLE_SAMPLES> lookupTable;
 private:
-	double cycleTime, amplitude = 1;
+	double frequency, amplitude = 1;
 };

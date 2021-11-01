@@ -4,17 +4,12 @@
 MixerEvent::MixerEvent(double frq, double amp)
 {
 	this->amplitude = amp;
-	this->cycleTime = 1.0 / frq;
+	this->frequency = frq;
 }
 
 double MixerEvent::getValueAtTime(double t)
 {
-	double phase = std::fmod(t, this->cycleTime) / this->cycleTime;
-	int ind = phase * LOOKUP_TABLE_SAMPLES;
-	double n1 = lookupTable[ind];
-	/*double n2 = lookupTable[(ind + 1) % LOOKUP_TABLE_SAMPLES]; //wrap around to 0th index
-	double interpolated = n1 * (1 - phase) + n2 * phase; //linear interpolation between 2 neighbouring nodes*/
-	return n1 * getAmplitude();
+	return getPreciseValueAtTime(t);
 }
 
 double MixerEvent::getPreciseValueAtTime(double t)
@@ -24,7 +19,7 @@ double MixerEvent::getPreciseValueAtTime(double t)
 
 double MixerEvent::getFrequency()
 {
-	return 1.0 / this->cycleTime;
+	return this->frequency;
 }
 
 double MixerEvent::getAmplitude()

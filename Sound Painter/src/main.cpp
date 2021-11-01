@@ -26,8 +26,6 @@ const int AUDIO_BUFFER_RATE = 44100;
 adm::Timer TIMER(false);
 Mixer MIXER;
 
-std::array<double, MixerEvent::LOOKUP_TABLE_SAMPLES> MixerEvent::lookupTable;
-
 MixerEvent mousePosToEvent(int x, int y, int w, int h)
 {
 	double frq = exp(lnLow + double(x) / w * (lnHigh - lnLow));
@@ -48,17 +46,6 @@ void fill_audio(void *udata, Uint8 *stream, int len)
 
 int main()
 {
-	
-	for (int i = 0; i < MixerEvent::LOOKUP_TABLE_SAMPLES; ++i)
-	{
-		MixerEvent::lookupTable[i] = sin(2 * M_PI*double(i) / MixerEvent::LOOKUP_TABLE_SAMPLES);
-	}
-
-	/*
-	std::ofstream fss("test.csv");
-	for (auto it : MixerEvent::lookupTable) fss << it << "\n";
-	fss.close();*/
-	
 	srand(time(0));
 	SDL_Init(SDL_INIT_EVERYTHING);
 
