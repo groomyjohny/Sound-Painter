@@ -11,5 +11,5 @@ public:
 	double getAmplitude();
 	double getDbAmplitude();
 private:
-	double frequency, amplitude = 1;
+	double argMult, amplitude = 1;
 };

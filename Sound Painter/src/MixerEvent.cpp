@@ -4,7 +4,7 @@
 MixerEvent::MixerEvent(double frq, double amp)
 {
 	this->amplitude = amp;
-	this->frequency = frq;
+	this->argMult = frq*2*M_PI;
 }
 
 double MixerEvent::getValueAtTime(double t)
@@ -14,12 +14,12 @@ double MixerEvent::getValueAtTime(double t)
 
 double MixerEvent::getPreciseValueAtTime(double t)
 {
-	return sin(2 * M_PI*getFrequency()*t)*getAmplitude();
+	return sin(argMult*t)*getAmplitude();
 }
 
 double MixerEvent::getFrequency()
 {
-	return this->frequency;
+	return this->argMult/(2*M_PI);
 }
 
 double MixerEvent::getAmplitude()
