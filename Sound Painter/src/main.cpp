@@ -26,6 +26,8 @@ const int AUDIO_BUFFER_RATE = 44100;
 adm::Timer TIMER(false);
 Mixer MIXER;
 
+bool PLAYBACK_IS_MUTED = false;
+
 MixerEvent mousePosToEvent(int x, int y, int w, int h)
 {
 	double frq = exp(lnLow + double(x) / w * (lnHigh - lnLow));
@@ -35,6 +37,12 @@ MixerEvent mousePosToEvent(int x, int y, int w, int h)
 
 void fill_audio(void *udata, Uint8 *stream, int len)
 {
+	if (PLAYBACK_IS_MUTED)
+	{
+		memset(stream, 0, len);
+		return;
+	}
+
 	double t = TIMER.getTime();
 	double cycleTime = 1.0 / AUDIO_BUFFER_RATE;
 	for (int i = 0; i < len/sizeof(float); ++i)
@@ -49,8 +57,8 @@ int main()
 	srand(time(0));
 	SDL_Init(SDL_INIT_EVERYTHING);
 
-	int w = 1280;
-	int h = 720;
+	int w = 2560;
+	int h = 1280;
 	int windowX = SDL_WINDOWPOS_CENTERED;
 	int windowY = SDL_WINDOWPOS_CENTERED;
 
@@ -126,6 +134,11 @@ int main()
 				double pointSpeed = bDiff / runTime;
 				std::cout << "Generated " << samples << " samples in " << runTime << " sec (" << sampleSpeed << "/s, " << sampleSpeed/44100 << "x real time @ 44100 Hz" << ")\n";
 				std::cout << "Sample difficulty: " << sDiff << "\nTotal: " << bDiff << " points (" << pointSpeed << "/s)\n\n";
+			}
+
+			if (events.key.keysym.scancode == SDL_SCANCODE_M)
+			{
+				PLAYBACK_IS_MUTED ^= 1; //toggle
 			}
 
 			if (events.type == SDL_MOUSEBUTTONDOWN)  //mouse click
