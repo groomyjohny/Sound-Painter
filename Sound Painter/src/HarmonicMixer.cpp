@@ -7,12 +7,21 @@ HarmonicMixer::HarmonicMixer(int nHarmonics)
 	for (auto& it : events) it.setAmplitude(0);
 }
 
+int HarmonicMixer::getHarmonicCount()
+{
+	return nHarmonics;
+}
+
 void HarmonicMixer::saveSoundToFile(std::string fileName)
 {
-	for (int i = 0; i < 127; ++i)
+	size_t p1 = fileName.find('.');
+	static std::string noteNames[] = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A","A#","B" };
+	for (int i = 0; i < 128; ++i)
 	{
+		std::string noteName = noteNames[i % 12] + std::to_string(i / 12 - 1);
+		std::string subname = fileName.substr(0, p1) + std::string(" ") + noteName +".wav";
 		setFundamentalFrequency(440 * pow(2, (i - 69) / 12.0));
-		Mixer::saveSoundToFile(std::to_string(i) + " " + fileName);
+		Mixer::saveSoundToFile(subname);
 	}
 }
 
@@ -38,6 +47,11 @@ void HarmonicMixer::setFundamentalFrequency(double frq)
 	{
 		events[i].setFrequency(frq*i);
 	}
+}
+
+double HarmonicMixer::getDuration()
+{
+	return 1;
 }
 
 void HarmonicMixer::clear()

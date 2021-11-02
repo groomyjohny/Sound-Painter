@@ -29,7 +29,7 @@ adm::Timer TIMER(false);
 std::shared_ptr<Mixer> MIXER;
 
 bool PLAYBACK_IS_MUTED = false;
-bool HARMONICS_MODE = false;
+bool HARMONICS_MODE = false; //DO NOT CHANGE TO TRUE, it needs other stuff to work properly! Look into H press handler
 const int HARMONICS_MODE_HARMONIC_COUNT = 64;
 
 MixerEvent mousePosToEvent(int x, int y, int w, int h)
@@ -41,7 +41,7 @@ MixerEvent mousePosToEvent(int x, int y, int w, int h)
 
 void fill_audio(void *udata, Uint8 *stream, int len)
 {
-	if (PLAYBACK_IS_MUTED)
+	if (PLAYBACK_IS_MUTED || MIXER == nullptr)
 	{
 		memset(stream, 0, len); //zero out the buffer to avoid sound looping
 		return;
@@ -51,7 +51,7 @@ void fill_audio(void *udata, Uint8 *stream, int len)
 	double cycleTime = 1.0 / AUDIO_BUFFER_RATE;
 	for (int i = 0; i < len/sizeof(float); ++i)
 	{
-		((float*)(stream))[i] = MIXER->getSample(t);
+		((float*)(stream))[i] = MIXER ? MIXER->getSample(t) : 0;
 		t += cycleTime;
 	}
 }
@@ -71,7 +71,7 @@ int main()
 	SDL_CreateWindowAndRenderer(w, h, 0, &wnd, &rend);
 
 	std::vector<SDL_Point> points;
-	std::map<int, int> pointMap;
+	std::map<int, int> harmonicsModePointMap;
 
 	bool mouseButtonDown = false;
 	int error = SDL_GL_SetSwapInterval(1);
@@ -105,7 +105,8 @@ int main()
 				std::string name;
 				std::string chars[2] = { "bcdfghjklmnpqrstvwxyz", "aeiou" };
 				for (int i = 0; i < 10; ++i) name += chars[i % 2][rand() % chars[i % 2].size()];
-				name = "output/" + name;
+				if (!HARMONICS_MODE) name = "output/" + name;
+				else name = "output/harmonics/" + name;
 			
 				MIXER->saveSpectrumToFile(name + ".txt");
 				MIXER->saveSoundToFile(name + ".wav");				
@@ -122,9 +123,18 @@ int main()
 			{
 				//clear routine
 				points.clear();
-				auto p = std::make_shared<HarmonicMixer>(HARMONICS_MODE_HARMONIC_COUNT);
-				MIXER = std::dynamic_pointer_cast<Mixer>(p);
-				p->setFundamentalFrequency(110);
+				HARMONICS_MODE ^= 1;
+
+				if (HARMONICS_MODE)
+				{
+					auto p = std::make_shared<HarmonicMixer>(HARMONICS_MODE_HARMONIC_COUNT);
+					MIXER = std::static_pointer_cast<Mixer>(p);
+					p->setFundamentalFrequency(110);
+				}
+				else
+				{
+					MIXER = std::make_shared<Mixer>();
+				}
 			}
 			
 			if (events.key.keysym.scancode == SDL_SCANCODE_B)
@@ -167,9 +177,20 @@ int main()
 			{
 				int x, y;
 				SDL_GetMouseState(&x, &y);
-				points.emplace_back(SDL_Point{ x,y });
 
-				MIXER->addEvent(mousePosToEvent(x, y, w, h));
+				if (!HARMONICS_MODE)
+				{
+					points.emplace_back(SDL_Point{ x,y });
+
+					MIXER->addEvent(mousePosToEvent(x, y, w, h));
+				}
+				else
+				{
+					int harmonicN = x / (w / HARMONICS_MODE_HARMONIC_COUNT);
+					harmonicsModePointMap[harmonicN] = y;
+					auto p = std::dynamic_pointer_cast<HarmonicMixer>(MIXER);
+					p->setHarmonicDbAmplitude(harmonicN, -dbFloor * double(y) / h);
+				}
 			}
 
 			if (events.type == SDL_MOUSEBUTTONUP)
@@ -192,12 +213,38 @@ int main()
 		
 		/*points.clear();
 		for (auto& it : pointMap) points.emplace_back(SDL_Point{ it.first,it.second });*/
-		if (!points.empty()) SDL_RenderDrawPoints(rend, &points.front(), points.size());
+
+			if (!HARMONICS_MODE && !points.empty()) SDL_RenderDrawPoints(rend, &points.front(), points.size());
+			if (HARMONICS_MODE && !harmonicsModePointMap.empty())
+			{
+				auto p = std::dynamic_pointer_cast<HarmonicMixer>(MIXER);
+				int n = p->getHarmonicCount();
+				std::vector<SDL_Rect> rects;
+				int i = 0;
+				auto it = harmonicsModePointMap.begin();
+				SDL_Rect r;
+				int harmonicWidth = w / HARMONICS_MODE_HARMONIC_COUNT;
+
+				while (it != harmonicsModePointMap.end())
+				{
+					r.x = it->first*harmonicWidth;
+					r.y = it->second;
+					r.w = harmonicWidth;
+					r.h = h - r.y;
+					rects.emplace_back(r);
+					++it;
+				}
+				SDL_RenderDrawRects(rend, &rects.front(), rects.size());
+			}
+
+
 		//frame rendering goes here
 		SDL_RenderPresent(rend);
+		
 
 		SDL_SetRenderDrawColor(rend, 255, 255, 255, SDL_ALPHA_OPAQUE);
 		SDL_RenderClear(rend);
+		SDL_Delay(16);
 	}
 
 	std::cin.ignore(999999);
