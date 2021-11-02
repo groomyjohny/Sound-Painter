@@ -11,17 +11,16 @@ public:
 	Mixer() = default;
 	Mixer(std::string fileName);
 
-	double getSample(double t);
-	double getDuration();
-	size_t getEventCount();
-	
-	std::vector<float> getSamplesFromUntil(double tBegin, double tEnd, SDL_AudioSpec spec);
-	void saveSoundToFile(std::string fileName);
-	void saveSpectrumToFile(std::string fileName);
-	void addEvent(const MixerEvent& evt);
-	void clear();
-private:
+	virtual double getSample(double t);
+	virtual double getDuration();
+	virtual size_t getEventCount();
+	virtual std::vector<float> getSamplesFromUntil(double tBegin, double tEnd, SDL_AudioSpec spec);
+
+	virtual void saveSoundToFile(std::string fileName);
+	virtual void saveSpectrumToFile(std::string fileName);
+	virtual void addEvent(const MixerEvent& evt);
+	virtual void clear();
+protected:
 	std::vector<MixerEvent> events;
-	static constexpr double FILE_EXPORT_DURATION = 20.0;
-	
+	static constexpr double FILE_EXPORT_DURATION = 20.0;	
 };

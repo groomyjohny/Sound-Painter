@@ -9,6 +9,8 @@
 #include <adm/Timer.h>
 #include "Mixer.h"
 #include "Helpers.h"
+#include <memory>
+#include "HarmonicMixer.h"
 
 #pragma comment(lib,"SDL2.lib")
 #undef main
@@ -24,9 +26,11 @@ double AUDIO_BUFFER_DURATION = 0.1;
 const int AUDIO_BUFFER_SAMPLES = 512;
 const int AUDIO_BUFFER_RATE = 44100;
 adm::Timer TIMER(false);
-Mixer MIXER;
+std::shared_ptr<Mixer> MIXER;
 
 bool PLAYBACK_IS_MUTED = false;
+bool HARMONICS_MODE = false;
+const int HARMONICS_MODE_HARMONIC_COUNT = 64;
 
 MixerEvent mousePosToEvent(int x, int y, int w, int h)
 {
@@ -39,7 +43,7 @@ void fill_audio(void *udata, Uint8 *stream, int len)
 {
 	if (PLAYBACK_IS_MUTED)
 	{
-		memset(stream, 0, len);
+		memset(stream, 0, len); //zero out the buffer to avoid sound looping
 		return;
 	}
 
@@ -47,7 +51,7 @@ void fill_audio(void *udata, Uint8 *stream, int len)
 	double cycleTime = 1.0 / AUDIO_BUFFER_RATE;
 	for (int i = 0; i < len/sizeof(float); ++i)
 	{
-		((float*)(stream))[i] = MIXER.getSample(t);
+		((float*)(stream))[i] = MIXER->getSample(t);
 		t += cycleTime;
 	}
 }
@@ -57,8 +61,8 @@ int main()
 	srand(time(0));
 	SDL_Init(SDL_INIT_EVERYTHING);
 
-	int w = 2560;
-	int h = 1280;
+	int w = 1280;
+	int h = 720;
 	int windowX = SDL_WINDOWPOS_CENTERED;
 	int windowY = SDL_WINDOWPOS_CENTERED;
 
@@ -87,6 +91,8 @@ int main()
 
 	TIMER.resume();
 	std::vector<float> audioBuffer;
+	MIXER = std::make_shared<Mixer>();
+	SDL_PauseAudioDevice(audioDeviceId, 0); 
 
 	while (true)
 	{
@@ -101,15 +107,24 @@ int main()
 				for (int i = 0; i < 10; ++i) name += chars[i % 2][rand() % chars[i % 2].size()];
 				name = "output/" + name;
 			
-				MIXER.saveSpectrumToFile(name + ".txt");
-				MIXER.saveSoundToFile(name + ".wav");				
+				MIXER->saveSpectrumToFile(name + ".txt");
+				MIXER->saveSoundToFile(name + ".wav");				
 			}
 
 			if (events.key.keysym.scancode == SDL_SCANCODE_C)
 			{
 				//clear routine
 				points.clear();
-				MIXER.clear();
+				MIXER->clear();
+			}
+
+			if (events.key.keysym.scancode == SDL_SCANCODE_H)
+			{
+				//clear routine
+				points.clear();
+				auto p = std::make_shared<HarmonicMixer>(HARMONICS_MODE_HARMONIC_COUNT);
+				MIXER = std::dynamic_pointer_cast<Mixer>(p);
+				p->setFundamentalFrequency(110);
 			}
 			
 			if (events.key.keysym.scancode == SDL_SCANCODE_B)
@@ -154,7 +169,7 @@ int main()
 				SDL_GetMouseState(&x, &y);
 				points.emplace_back(SDL_Point{ x,y });
 
-				MIXER.addEvent(mousePosToEvent(x, y, w, h));
+				MIXER->addEvent(mousePosToEvent(x, y, w, h));
 			}
 
 			if (events.type == SDL_MOUSEBUTTONUP)
@@ -174,7 +189,7 @@ int main()
 		//double currT = timer.getTime();
 		//audioBuffer = MIXER.getSamplesFromUntil(currT, currT + AUDIO_BUFFER_DURATION, obtained);
 		//SDL_QueueAudio(audioDeviceId, (void*)&audioBuffer.front(), sizeof(float)*audioBuffer.size());
-		SDL_PauseAudioDevice(audioDeviceId, 0);
+		
 		/*points.clear();
 		for (auto& it : pointMap) points.emplace_back(SDL_Point{ it.first,it.second });*/
 		if (!points.empty()) SDL_RenderDrawPoints(rend, &points.front(), points.size());

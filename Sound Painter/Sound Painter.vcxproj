@@ -135,11 +135,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\HarmonicMixer.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Mixer.cpp" />
     <ClCompile Include="src\MixerEvent.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\HarmonicMixer.h" />
     <ClInclude Include="src\Helpers.h" />
     <ClInclude Include="src\Mixer.h" />
     <ClInclude Include="src\MixerEvent.h" />

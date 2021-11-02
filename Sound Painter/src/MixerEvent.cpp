@@ -3,8 +3,8 @@
 
 MixerEvent::MixerEvent(double frq, double amp)
 {
-	this->amplitude = amp;
-	this->argMult = frq*2*M_PI;
+	this->setAmplitude(amp);
+	this->setFrequency(frq);
 }
 
 double MixerEvent::getValueAtTime(double t)
@@ -30,4 +30,19 @@ double MixerEvent::getAmplitude()
 double MixerEvent::getDbAmplitude()
 {
 	return log10(amplitude) * 10;
+}
+
+void MixerEvent::setFrequency(double frq)
+{
+	this->argMult = frq * 2 * M_PI;
+}
+
+void MixerEvent::setAmplitude(double amp)
+{
+	this->amplitude = amp;
+}
+
+void MixerEvent::setDbAmplitude(double dbAmp)
+{
+	this->setAmplitude(pow(10, dbAmp / 10));
 }
