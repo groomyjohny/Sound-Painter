@@ -22,7 +22,7 @@ double dbFloor = 96;
 double lnLow = log(lowFrq);
 double lnHigh = log(highFrq);
 
-double AUDIO_BUFFER_DURATION = 0.1;
+double AUDIO_BUFFER_DURATION_SECONDS = 0.1;
 const int AUDIO_BUFFER_SAMPLES = 512;
 const int AUDIO_BUFFER_RATE = 44100;
 adm::Timer TIMER(false);
@@ -81,7 +81,7 @@ int main()
 	desired.freq = AUDIO_BUFFER_RATE;
 	desired.format = AUDIO_F32SYS;
 	desired.channels = 1;
-	desired.samples = AUDIO_BUFFER_DURATION;
+	desired.samples = AUDIO_BUFFER_SAMPLES;
 	desired.userdata = 0;
 	desired.callback = fill_audio;
 
