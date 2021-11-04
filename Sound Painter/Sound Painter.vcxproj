@@ -135,16 +135,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\DrawMode.cpp" />
     <ClCompile Include="src\HarmonicMixer.cpp" />
+    <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Mixer.cpp" />
     <ClCompile Include="src\MixerEvent.cpp" />
+    <ClCompile Include="src\ProgramMode.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\DrawMode.h" />
     <ClInclude Include="src\HarmonicMixer.h" />
     <ClInclude Include="src\Helpers.h" />
+    <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\Mixer.h" />
     <ClInclude Include="src\MixerEvent.h" />
+    <ClInclude Include="src\ProgramMode.h" />
+    <ClInclude Include="src\ProgramState.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
