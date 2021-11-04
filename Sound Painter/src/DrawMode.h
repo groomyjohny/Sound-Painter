@@ -3,7 +3,7 @@
 class DrawMode : public ProgramMode
 {
 public:
-	DrawMode(ProgramState& state);
+	DrawMode(ProgramState* state);
 	virtual void draw();
 protected:
 	std::vector<SDL_Point> points;

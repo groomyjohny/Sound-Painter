@@ -6,6 +6,7 @@ public:
 	HarmonicMixer() = default;
 	HarmonicMixer(int nHarmonics);
 	virtual int getHarmonicCount();
+	virtual void setHarmoicsCount(int n);
 	virtual void saveSoundToFile(std::string fileName);
 	virtual void saveSpectrumToFile(std::string fileName);
 	virtual void setHarmonicAmplitude(int harmonicNumber, double amp);

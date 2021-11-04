@@ -1,10 +1,10 @@
 #pragma once
 #include "ProgramMode.h"
 #include "HarmonicMixer.h"
-class HarmonicsMode : ProgramMode
+class HarmonicsMode : public ProgramMode
 {
 public:
-	HarmonicsMode(ProgramState& state);
+	HarmonicsMode(ProgramState* state);
 	virtual void draw();
 private:
 	HarmonicMixer mixer;

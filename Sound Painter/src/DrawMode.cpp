@@ -1,11 +1,11 @@
 #include "DrawMode.h"
 #include <cmath>
 
-DrawMode::DrawMode(ProgramState & state)
+DrawMode::DrawMode(ProgramState * state)
 {
-	this->state = &state;
-	state.MIXER = &mixer;
-	state.currentMode = this;
+	this->state = state;
+	state->MIXER = &mixer;
+	state->currentMode = this;
 }
 
 void DrawMode::draw()

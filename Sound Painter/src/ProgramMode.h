@@ -9,7 +9,7 @@ class ProgramMode
 {
 public:
 	ProgramMode() = default;
-	ProgramMode(ProgramState& state);
+	ProgramMode(ProgramState* state);
 	virtual std::vector<SDL_Event> pollAndHandleEvents(); //basic mode switching
 	virtual void draw() = 0;
 protected:
@@ -17,6 +17,7 @@ protected:
 	virtual void clear() = 0;
 	virtual void save() = 0;
 	virtual std::string generateNameBase();
+	virtual void runBenchmark();
 
 	ProgramState* state;
 };

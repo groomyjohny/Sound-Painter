@@ -18,8 +18,8 @@
 #pragma comment(lib,"SDL2.lib")
 #undef main
 
-ProgramState state;
-ProgramMode* mode;
+ProgramState* realState = new ProgramState();
+ProgramState& state = *realState;
 
 void fill_audio(void *udata, Uint8 *stream, int len)
 {
@@ -69,13 +69,12 @@ int main()
 	std::vector<float> audioBuffer;
 	SDL_PauseAudioDevice(audioDeviceId, 0); 
 
-	mode = new DrawMode(state);
-	state.currentMode = mode;
+	state.currentMode = new DrawMode(realState);
 
 	while (true)
 	{
 		SDL_Event events;
-		mode->pollAndHandleEvents();
+		state.currentMode->pollAndHandleEvents();
 			//input processing goes here
 			
 
@@ -112,7 +111,7 @@ int main()
 
 
 		//frame rendering goes here
-		mode->draw();
+		state.currentMode->draw();
 		SDL_RenderPresent(state.rend);
 		
 		SDL_RenderClear(state.rend);

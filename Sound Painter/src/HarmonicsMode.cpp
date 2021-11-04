@@ -1,14 +1,18 @@
 #include "HarmonicsMode.h"
 
-HarmonicsMode::HarmonicsMode(ProgramState & state)
+HarmonicsMode::HarmonicsMode(ProgramState* state)
 {
-	state.MIXER = &mixer;
-	state.currentMode = this;
+	this->state = state;
+	state->MIXER = &mixer;
+	state->currentMode = this;
+	mixer.setHarmoicsCount(state->HARMONICS_MODE_HARMONIC_COUNT);
 	mixer.setFundamentalFrequency(110);
 }
 
 void HarmonicsMode::draw()
 {
+	if (bars.empty()) return;
+
 	SDL_SetRenderDrawColor(state->rend, 0, 0, 0, SDL_ALPHA_OPAQUE);
 
 	int n = mixer.getHarmonicCount();
@@ -33,6 +37,7 @@ void HarmonicsMode::draw()
 
 void HarmonicsMode::handleEvent(SDL_Event & event)
 {
+	ProgramMode::handleEvent(event);
 	if (state->input.isMouseButtonHeld(SDL_BUTTON_LEFT) && event.type == SDL_MOUSEMOTION)
 	{
 		this->setPoint(event.motion.x, event.motion.y);
@@ -59,5 +64,5 @@ void HarmonicsMode::setPoint(int x, int y)
 	int harmonicNumber = x / harmonicWidth;
 
 	bars[harmonicNumber] = y;
-	mixer.setHarmonicDbAmplitude(harmonicNumber + 1, -state->dbFloor*double(y) / state->h);
+	mixer.setHarmonicDbAmplitude(harmonicNumber, -state->dbFloor*double(y) / state->h);
 }

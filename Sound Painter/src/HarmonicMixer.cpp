@@ -12,6 +12,14 @@ int HarmonicMixer::getHarmonicCount()
 	return nHarmonics;
 }
 
+void HarmonicMixer::setHarmoicsCount(int n)
+{
+	int newEntries = n - nHarmonics;
+	nHarmonics = n;
+	events.resize(n);
+	for (int i = 0; i < newEntries; ++i) events[n - i - 1].setAmplitude(0); //silence new harmonics
+}
+
 void HarmonicMixer::saveSoundToFile(std::string fileName)
 {
 	size_t p1 = fileName.find('.');
@@ -27,6 +35,7 @@ void HarmonicMixer::saveSoundToFile(std::string fileName)
 
 void HarmonicMixer::saveSpectrumToFile(std::string fileName)
 {
+	Mixer::saveSpectrumToFile(fileName);
 }
 
 void HarmonicMixer::setHarmonicAmplitude(int harmonicNumber, double amp)
@@ -45,7 +54,7 @@ void HarmonicMixer::setFundamentalFrequency(double frq)
 	this->fundamentalFrequency = frq;
 	for (int i = 0; i < nHarmonics; ++i)
 	{
-		events[i].setFrequency(frq*i);
+		events[i].setFrequency(frq*(i+1));
 	}
 }
 
@@ -56,5 +65,5 @@ double HarmonicMixer::getDuration()
 
 void HarmonicMixer::clear()
 {
-	Mixer::clear();
+	for (auto& it : events) it.setAmplitude(0);
 }
