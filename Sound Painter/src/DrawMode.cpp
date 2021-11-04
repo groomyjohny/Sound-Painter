@@ -5,6 +5,7 @@ DrawMode::DrawMode(ProgramState & state)
 {
 	this->state = &state;
 	state.MIXER = &mixer;
+	state.currentMode = this;
 }
 
 void DrawMode::draw()

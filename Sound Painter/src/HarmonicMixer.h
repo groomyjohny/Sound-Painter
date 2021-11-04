@@ -3,6 +3,7 @@
 class HarmonicMixer : public Mixer
 {
 public:
+	HarmonicMixer() = default;
 	HarmonicMixer(int nHarmonics);
 	virtual int getHarmonicCount();
 	virtual void saveSoundToFile(std::string fileName);

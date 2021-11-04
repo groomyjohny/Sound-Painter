@@ -26,7 +26,7 @@ struct ProgramState
 	const int AUDIO_BUFFER_RATE = 44100;
 	adm::Timer TIMER = adm::Timer(false);
 	Mixer* MIXER;
-	std::shared_ptr<ProgramMode>* currentMode;
+	ProgramMode* currentMode;
 
 	bool PLAYBACK_IS_MUTED = false;
 	bool HARMONICS_MODE = false; //DO NOT CHANGE TO TRUE, it needs other stuff to work properly! Look into H press handler

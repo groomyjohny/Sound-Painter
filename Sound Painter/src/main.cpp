@@ -19,7 +19,7 @@
 #undef main
 
 ProgramState state;
-std::shared_ptr<ProgramMode> mode;
+ProgramMode* mode;
 
 void fill_audio(void *udata, Uint8 *stream, int len)
 {
@@ -69,8 +69,8 @@ int main()
 	std::vector<float> audioBuffer;
 	SDL_PauseAudioDevice(audioDeviceId, 0); 
 
-	mode = std::make_shared<DrawMode>(state);
-	state.currentMode = &mode;
+	mode = new DrawMode(state);
+	state.currentMode = mode;
 
 	while (true)
 	{
