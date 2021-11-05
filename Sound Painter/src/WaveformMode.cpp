@@ -1,5 +1,6 @@
 #include "WaveformMode.h"
 #include "LineCurve.h"
+#include <fstream>
 
 WaveformMode::WaveformMode(ProgramState * state)
 {
@@ -51,10 +52,25 @@ void WaveformMode::clear()
 void WaveformMode::save()
 {
 	std::string baseName = generateNameBase();
-	std::string name = "output/waveforms/" + baseName + ".wav";
+	std::string name = "output/waveforms/" + baseName;
 
+	int p = 15;
+	int w = p + 5;
+	std::ofstream f(name + ".txt");
+	f.precision(p);
+	f << "Waveform\n";
+	int i = 1;
+	for (auto& it : mixer.getEvents())
+	{
+		f << "Line " << i++ << "\n";
+		auto p = std::dynamic_pointer_cast<LineCurve>(it);
+		for (auto& it2 : p->getSegments())
+		{
+			f << std::setw(w) << it2.phaseBegin << std::setw(w) << it2.phaseEnd << std::setw(w) << it2.ampBegin << std::setw(w) << it2.ampEnd << "\n";
+		}
+	}
 	for (auto& it : mixer.getEvents()) it->setFrequency(110);
-	mixer.saveSoundToFile(name);
+	mixer.saveSoundToFile(name+".wav");
 }
 
 void WaveformMode::addPoint(int x, int y)
