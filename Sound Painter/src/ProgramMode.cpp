@@ -1,7 +1,10 @@
-#include "ProgramMode.h"
 #include <iostream>
+
+#include "ProgramMode.h"
+#include "DrawMode.h"
 #include "HarmonicsMode.h"
 #include "WaveformMode.h"
+
 ProgramMode::ProgramMode(ProgramState* state)
 	:state(state)
 {
@@ -28,9 +31,9 @@ void ProgramMode::runOncePerFrameHandlers(std::vector<SDL_Event>& events)
 	if (inp.isKeyboardButtonPressed(SDL_SCANCODE_C)) this->clear();
 	if (inp.isKeyboardButtonPressed(SDL_SCANCODE_M)) state->PLAYBACK_IS_MUTED ^= 1; //toggle
 
+	if (inp.isKeyboardButtonPressed(SDL_SCANCODE_D)) state->pendingMode = std::make_shared<DrawMode>(state);
 	if (inp.isKeyboardButtonPressed(SDL_SCANCODE_H)) state->pendingMode = std::make_shared<HarmonicsMode>(state);
 	if (inp.isKeyboardButtonPressed(SDL_SCANCODE_W)) state->pendingMode = std::make_shared<WaveformMode>(state);
-
 
 	if (inp.isKeyboardButtonPressed(SDL_SCANCODE_ESCAPE)) exit(-1);
 }
