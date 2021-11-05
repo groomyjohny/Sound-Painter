@@ -23,11 +23,11 @@ ProgramState& state = *realState;
 
 void fill_audio(void *udata, Uint8 *stream, int len)
 {
-	/*if (state.PLAYBACK_IS_MUTED || !state.MIXER)
-	{*/
+	if (state.PLAYBACK_IS_MUTED || !state.MIXER)
+	{
 		memset(stream, 0, len); //zero out the buffer to avoid sound looping
 		return;
-	//}
+	}
 
 	double t = state.TIMER.getTime();
 	double cycleTime = 1.0 / state.AUDIO_BUFFER_RATE;

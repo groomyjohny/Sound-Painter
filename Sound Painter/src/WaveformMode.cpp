@@ -34,7 +34,12 @@ void WaveformMode::runOncePerFrameHandlers(std::vector<SDL_Event>& events)
 {
 	ProgramMode::runOncePerFrameHandlers(events);
 	auto inp = state->input;
-	if (inp.isMouseButtonPressed(SDL_BUTTON_LEFT)) mixer.addEvent(std::make_shared<LineCurve>());
+	if (inp.isMouseButtonPressed(SDL_BUTTON_LEFT))
+	{
+		auto lc = std::make_shared<LineCurve>();
+		lc->setFrequency(110);
+		mixer.addEvent(lc);
+	}
 }
 
 void WaveformMode::runIndividualEventHandler(SDL_Event & event)

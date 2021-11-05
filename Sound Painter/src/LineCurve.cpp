@@ -19,6 +19,7 @@ double LineCurve::getValueAtTime(double t)
 
 double LineCurve::getPreciseValueAtTime(double t)
 {
+	if (segments.empty()) return 0;
 	double l = segments.front().phaseBegin;
 	double h = segments.back().phaseEnd;
 
