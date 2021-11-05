@@ -31,6 +31,9 @@ void fill_audio(void *udata, Uint8 *stream, int len)
 
 	double t = state.TIMER.getTime();
 	double cycleTime = 1.0 / state.AUDIO_BUFFER_RATE;
+	auto m = state.MIXER->getMutex();
+	std::lock_guard g(*m);
+
 	for (int i = 0; i < len/sizeof(float); ++i)
 	{
 		((float*)(stream))[i] = state.MIXER ? state.MIXER->getSample(t) : 0;

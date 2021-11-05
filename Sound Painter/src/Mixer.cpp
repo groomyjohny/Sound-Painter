@@ -90,21 +90,28 @@ void Mixer::saveSpectrumToFile(std::string fileName)
 }
 void Mixer::addEvent(const MixerEvent* evt)
 {
+	std::lock_guard g(*mtx);
 	events.emplace_back(std::make_shared<MixerEvent>(*evt));
 }
 
 void Mixer::addEvent(std::shared_ptr<MixerEvent> evt)
 {
+	std::lock_guard g(*mtx);
 	events.push_back(evt);
 }
 
 void Mixer::clear()
 {
+	std::lock_guard g(*mtx);
 	events.clear();
 }
 std::vector<std::shared_ptr<MixerEvent>>& Mixer::getEvents()
 {
 	return events;
+}
+std::shared_ptr<std::mutex> Mixer::getMutex()
+{
+	return mtx;
 }
 std::vector<float> Mixer::getSamplesFromUntil(double tBegin, double tEnd, SDL_AudioSpec spec)
 {
@@ -118,8 +125,15 @@ std::vector<float> Mixer::getSamplesFromUntil(double tBegin, double tEnd, SDL_Au
 	return ret;
 }
 
+/*
+Mixer::Mixer()
+{
+	mtx = std::make_shared<std::mutex>();
+}
+*/
 Mixer::Mixer(std::string fileName)
 {
+	//mtx = std::make_shared<std::mutex>();
 	std::ifstream f(fileName);
 	double frq, db;
 	while (f >> frq >> db)
@@ -135,6 +149,8 @@ double Mixer::getSample(double t)
 
 	double sum = 0;
 	double maxAmplitude = 0;
+	//std::lock_guard g(*mtx);
+
 	for (auto& it : events)
 	{
 		sum += it->getValueAtTime(t);
