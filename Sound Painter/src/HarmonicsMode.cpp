@@ -3,6 +3,7 @@
 HarmonicsMode::HarmonicsMode(ProgramState* state)
 {
 	this->state = state;
+	harmonicsCount = state->HARMONICS_MODE_HARMONIC_COUNT;
 	state->MIXER = &mixer;
 	state->currentMode = this;
 	mixer.setHarmoicsCount(state->HARMONICS_MODE_HARMONIC_COUNT);
@@ -20,17 +21,21 @@ void HarmonicsMode::draw()
 	int i = 0;
 	auto it = bars.begin();
 	SDL_Rect r;
-	int harmonicWidth = state->w / state->HARMONICS_MODE_HARMONIC_COUNT;
+	double harmonicWidth = double(state->w) / harmonicsCount;
 
 	while (it != bars.end())
 	{
 		r.x = it->first*harmonicWidth;
 		r.y = it->second;
-		r.w = harmonicWidth;
 		r.h = state->h - r.y;
 		rects.emplace_back(r);
 		++it;
 	}
+
+	for (int i = 0; i < rects.size()-1; ++i) rects[i].w = rects[i + 1].x - rects[i].x; //determine widths to avoid empty areas
+	if (rects.size() >= this->harmonicsCount) rects.back().w = state->w - rects.back().x; //if this harmonic is last, then stretch it to the edge of the screen
+	else rects.back().w = harmonicWidth; 
+
 	SDL_RenderDrawRects(state->rend, &rects.front(), rects.size());
 	SDL_SetRenderDrawColor(state->rend, 255, 255, 255, SDL_ALPHA_OPAQUE);
 }
@@ -42,6 +47,16 @@ void HarmonicsMode::runIndividualEventHandler(SDL_Event & event)
 	{
 		this->setPoint(event.motion.x, event.motion.y);
 	}
+}
+
+void HarmonicsMode::runOncePerFrameHandlers(std::vector<SDL_Event>& events)
+{
+	ProgramMode::runOncePerFrameHandlers(events);
+	
+	auto inp = state->input;
+	if (inp.isKeyboardButtonPressed(SDL_SCANCODE_R)) this->setRandomIntensities();
+	if (inp.isKeyboardButtonPressed(SDL_SCANCODE_MINUS)) this->changeHarmonicsCount(-1);
+	if (inp.isKeyboardButtonPressed(SDL_SCANCODE_EQUALS)) this->changeHarmonicsCount(1);
 }
 
 void HarmonicsMode::clear()
@@ -60,9 +75,28 @@ void HarmonicsMode::save()
 
 void HarmonicsMode::setPoint(int x, int y)
 {
-	int harmonicWidth = state->w / state->HARMONICS_MODE_HARMONIC_COUNT;
+	double harmonicWidth = double(state->w) / harmonicsCount;
 	int harmonicNumber = x / harmonicWidth;
 
 	bars[harmonicNumber] = y;
 	mixer.setHarmonicDbAmplitude(harmonicNumber, -state->dbFloor*double(y) / state->h);
+}
+
+void HarmonicsMode::setRandomIntensities()
+{
+	for (int i = 0; i < 65536; ++i)
+	{
+		int x = rand() % state->w;
+		int y = rand() % state->h;
+		setPoint(x, y);
+	}
+}
+
+void HarmonicsMode::changeHarmonicsCount(int amount)
+{
+	int futureHarmonicsCount = harmonicsCount + amount;
+	if (futureHarmonicsCount < 1) return;
+
+	harmonicsCount = futureHarmonicsCount;
+	mixer.setHarmoicsCount(futureHarmonicsCount);
 }

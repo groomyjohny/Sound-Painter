@@ -17,7 +17,12 @@ void HarmonicMixer::setHarmoicsCount(int n)
 	int newEntries = n - nHarmonics;
 	nHarmonics = n;
 	events.resize(n);
-	for (int i = 0; i < newEntries; ++i) events[n - i - 1].setAmplitude(0); //silence new harmonics
+	for (int i = 0; i < newEntries; ++i)
+	{
+		int ind = n - i - 1;
+		events[ind].setFrequency(fundamentalFrequency*(ind + 1));
+		events[ind].setAmplitude(0); //silence new harmonics
+	}
 }
 
 void HarmonicMixer::saveSoundToFile(std::string fileName)
