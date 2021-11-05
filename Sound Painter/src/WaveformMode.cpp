@@ -5,8 +5,6 @@
 WaveformMode::WaveformMode(ProgramState * state)
 {
 	this->state = state;
-	state->currentMode = this;
-	state->MIXER = &mixer;
 }
 
 void WaveformMode::draw()
@@ -28,6 +26,11 @@ void WaveformMode::draw()
 		if (!points.empty()) SDL_RenderDrawLines(state->rend, &points.front(), points.size());
 	}
 	SDL_SetRenderDrawColor(state->rend, 255, 255, 255, SDL_ALPHA_OPAQUE);
+}
+
+Mixer * WaveformMode::getMixer()
+{
+	return &mixer;
 }
 
 void WaveformMode::runOncePerFrameHandlers(std::vector<SDL_Event>& events)

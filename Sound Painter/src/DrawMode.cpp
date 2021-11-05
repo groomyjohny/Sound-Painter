@@ -4,8 +4,6 @@
 DrawMode::DrawMode(ProgramState * state)
 {
 	this->state = state;
-	state->MIXER = &mixer;
-	state->currentMode = this;
 }
 
 void DrawMode::draw()
@@ -13,6 +11,11 @@ void DrawMode::draw()
 	SDL_SetRenderDrawColor(state->rend, 0, 0, 0, SDL_ALPHA_OPAQUE);
 	if (!points.empty()) SDL_RenderDrawPoints(state->rend, &points.front(), points.size());
 	SDL_SetRenderDrawColor(state->rend, 255, 255, 255, SDL_ALPHA_OPAQUE);
+}
+
+Mixer * DrawMode::getMixer()
+{
+	return &mixer;
 }
 
 void DrawMode::runIndividualEventHandler(SDL_Event & event)

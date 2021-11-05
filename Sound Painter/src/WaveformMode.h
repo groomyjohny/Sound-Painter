@@ -5,6 +5,7 @@ class WaveformMode : public ProgramMode
 public:
 	WaveformMode(ProgramState* state);
 	virtual void draw();
+	virtual Mixer* getMixer();
 protected:
 	virtual void runOncePerFrameHandlers(std::vector<SDL_Event>& events);
 	virtual void runIndividualEventHandler(SDL_Event& event); //default event handlers

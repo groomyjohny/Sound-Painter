@@ -21,22 +21,25 @@
 ProgramState* realState = new ProgramState();
 ProgramState& state = *realState;
 
+void fill_audio_with_zeros(void *udata, Uint8 *stream, int len)
+{
+	memset(stream, 0, len);
+}
 void fill_audio(void *udata, Uint8 *stream, int len)
 {
-	if (state.PLAYBACK_IS_MUTED || !state.MIXER)
-	{
-		memset(stream, 0, len); //zero out the buffer to avoid sound looping
-		return;
-	}
+	auto mode = state.currentMode;
+	if (!mode) return fill_audio_with_zeros(udata, stream, len);
+	auto mixer = mode->getMixer();
+	if (state.PLAYBACK_IS_MUTED || !mixer) return fill_audio_with_zeros(udata, stream, len);
 
 	double t = state.TIMER.getTime();
-	double cycleTime = 1.0 / state.AUDIO_BUFFER_RATE;
-	auto m = state.MIXER->getMutex();
+	double cycleTime = 1.0 / state.AUDIO_BUFFER_RATE;	
+	auto m = mixer->getMutex();
 	std::lock_guard g(*m);
 
 	for (int i = 0; i < len/sizeof(float); ++i)
 	{
-		((float*)(stream))[i] = state.MIXER ? state.MIXER->getSample(t) : 0;
+		((float*)(stream))[i] = mixer ? mixer->getSample(t) : 0;
 		t += cycleTime;
 	}
 }
@@ -69,10 +72,16 @@ int main()
 	std::vector<float> audioBuffer;
 	SDL_PauseAudioDevice(audioDeviceId, 0); 
 
-	state.currentMode = new DrawMode(realState);
+	state.pendingMode = std::make_shared<DrawMode>(realState);
 
 	while (true)
 	{
+		if (state.pendingMode)
+		{
+			state.currentMode = state.pendingMode;
+			state.pendingMode.reset();
+		}
+
 		state.currentMode->pollAndHandleEvents();
 		state.currentMode->draw();
 		SDL_RenderPresent(state.rend);

@@ -15,6 +15,11 @@ std::vector<SDL_Event> ProgramMode::pollAndHandleEvents()
 	return events;
 }
 
+Mixer * ProgramMode::getMixer()
+{
+	return nullptr;
+}
+
 void ProgramMode::runOncePerFrameHandlers(std::vector<SDL_Event>& events)
 {
 	auto& inp = state->input;
@@ -23,15 +28,9 @@ void ProgramMode::runOncePerFrameHandlers(std::vector<SDL_Event>& events)
 	if (inp.isKeyboardButtonPressed(SDL_SCANCODE_C)) this->clear();
 	if (inp.isKeyboardButtonPressed(SDL_SCANCODE_M)) state->PLAYBACK_IS_MUTED ^= 1; //toggle
 
-	if (inp.isKeyboardButtonPressed(SDL_SCANCODE_H))
-	{
-		state->currentMode = new HarmonicsMode(state);
-	}
+	if (inp.isKeyboardButtonPressed(SDL_SCANCODE_H)) state->pendingMode = std::make_shared<HarmonicsMode>(state);
+	if (inp.isKeyboardButtonPressed(SDL_SCANCODE_W)) state->pendingMode = std::make_shared<WaveformMode>(state);
 
-	if (inp.isKeyboardButtonPressed(SDL_SCANCODE_W))
-	{
-		state->currentMode = new WaveformMode(state);
-	}
 
 	if (inp.isKeyboardButtonPressed(SDL_SCANCODE_ESCAPE)) exit(-1);
 }

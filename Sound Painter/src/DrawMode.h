@@ -5,6 +5,7 @@ class DrawMode : public ProgramMode
 public:
 	DrawMode(ProgramState* state);
 	virtual void draw();
+	virtual Mixer* getMixer();
 protected:
 	std::vector<SDL_Point> points;
 	Mixer mixer;

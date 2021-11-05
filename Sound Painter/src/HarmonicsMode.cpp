@@ -4,8 +4,6 @@ HarmonicsMode::HarmonicsMode(ProgramState* state)
 {
 	this->state = state;
 	harmonicsCount = state->HARMONICS_MODE_HARMONIC_COUNT;
-	state->MIXER = &mixer;
-	state->currentMode = this;
 	mixer.setHarmoicsCount(state->HARMONICS_MODE_HARMONIC_COUNT);
 	mixer.setFundamentalFrequency(110);
 }
