@@ -5,16 +5,16 @@ class MixerEvent
 public:
 	MixerEvent() = default;
 	MixerEvent(double frq, double amp = 1);
-	double getValueAtTime(double t); //used for real-time playback
-	double getPreciseValueAtTime(double t); //used for saving to a file
+	virtual double getValueAtTime(double t); //used for real-time playback
+	virtual double getPreciseValueAtTime(double t); //used for saving to a file
 
-	double getFrequency();
-	double getAmplitude();
-	double getDbAmplitude();
+	virtual double getFrequency();
+	virtual double getAmplitude();
+	virtual double getDbAmplitude();
 
-	void setFrequency(double frq);
-	void setAmplitude(double amp);
-	void setDbAmplitude(double dbAmp);
+	virtual void setFrequency(double frq);
+	virtual void setAmplitude(double amp);
+	virtual void setDbAmplitude(double dbAmp);
 private:
 	double argMult, amplitude = 1;
 };
