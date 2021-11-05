@@ -55,6 +55,10 @@ int16_t double2word(double n) //smash double in range[-1...1] to a int16
 
 void Mixer::saveSoundToFile(std::string fileName)
 {
+	saveSoundToFile(std::filesystem::path(fileName));
+}
+void Mixer::saveSoundToFile(std::filesystem::path fileName)
+{
 	auto& mx = *this;
 	double seconds = mx.getDuration();
 	int sampleRate = 48000;
