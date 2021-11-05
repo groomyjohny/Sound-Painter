@@ -63,10 +63,7 @@ int main()
 	desired.samples = state.AUDIO_BUFFER_SAMPLES;
 	desired.userdata = 0;
 	desired.callback = fill_audio;
-
-	//int openAudioError = SDL_OpenAudio(&desired, &obtained);
 	SDL_AudioDeviceID audioDeviceId = SDL_OpenAudioDevice(nullptr, 0, &desired, &obtained, SDL_AUDIO_ALLOW_FORMAT_CHANGE);
-	//SDL_QueueAudio(dev, buf.data(), sizeof(float) * buf.size());
 
 	state.TIMER.resume();
 	std::vector<float> audioBuffer;
@@ -76,44 +73,7 @@ int main()
 
 	while (true)
 	{
-		SDL_Event events;
 		state.currentMode->pollAndHandleEvents();
-			//input processing goes here
-			
-
-		//SDL_ClearQueuedAudio(audioDeviceId);
-		//double currT = timer.getTime();
-		//audioBuffer = MIXER.getSamplesFromUntil(currT, currT + AUDIO_BUFFER_DURATION, obtained);
-		//SDL_QueueAudio(audioDeviceId, (void*)&audioBuffer.front(), sizeof(float)*audioBuffer.size());
-		
-		/*points.clear();
-		for (auto& it : pointMap) points.emplace_back(SDL_Point{ it.first,it.second });*/
-
-			/*if (!HARMONICS_MODE && !points.empty()) SDL_RenderDrawPoints(rend, &points.front(), points.size());
-			if (HARMONICS_MODE && !harmonicsModePointMap.empty())
-			{
-				auto p = std::dynamic_pointer_cast<HarmonicMixer>(MIXER);
-				int n = p->getHarmonicCount();
-				std::vector<SDL_Rect> rects;
-				int i = 0;
-				auto it = harmonicsModePointMap.begin();
-				SDL_Rect r;
-				int harmonicWidth = w / HARMONICS_MODE_HARMONIC_COUNT;
-
-				while (it != harmonicsModePointMap.end())
-				{
-					r.x = it->first*harmonicWidth;
-					r.y = it->second;
-					r.w = harmonicWidth;
-					r.h = h - r.y;
-					rects.emplace_back(r);
-					++it;
-				}
-				SDL_RenderDrawRects(rend, &rects.front(), rects.size());
-			}*/
-
-
-		//frame rendering goes here
 		state.currentMode->draw();
 		SDL_RenderPresent(state.rend);
 		

@@ -125,15 +125,8 @@ std::vector<float> Mixer::getSamplesFromUntil(double tBegin, double tEnd, SDL_Au
 	return ret;
 }
 
-/*
-Mixer::Mixer()
-{
-	mtx = std::make_shared<std::mutex>();
-}
-*/
 Mixer::Mixer(std::string fileName)
 {
-	//mtx = std::make_shared<std::mutex>();
 	std::ifstream f(fileName);
 	double frq, db;
 	while (f >> frq >> db)
@@ -149,7 +142,6 @@ double Mixer::getSample(double t)
 
 	double sum = 0;
 	double maxAmplitude = 0;
-	//std::lock_guard g(*mtx);
 
 	for (auto& it : events)
 	{
