@@ -19,9 +19,11 @@ public:
 	virtual void saveSoundToFile(std::string fileName);
 	virtual void saveSoundToFile(std::filesystem::path fileName);
 	virtual void saveSpectrumToFile(std::string fileName);
-	virtual void addEvent(const MixerEvent& evt);
+	virtual void addEvent(const MixerEvent* evt);
+	virtual void addEvent(std::shared_ptr<MixerEvent> evt);
 	virtual void clear();
+	virtual std::vector<std::shared_ptr<MixerEvent>>& getEvents();
 protected:
-	std::vector<MixerEvent> events;
+	std::vector<std::shared_ptr<MixerEvent>> events;
 	static constexpr double FILE_EXPORT_DURATION = 20.0;	
 };

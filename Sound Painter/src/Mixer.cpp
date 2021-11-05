@@ -85,17 +85,26 @@ void Mixer::saveSpectrumToFile(std::string fileName)
 	f.precision(p);
 	for (auto& it : this->events)
 	{
-		f  << std::setw(p + 5) << it.getFrequency() << std::setw(p+5) << it.getDbAmplitude() << "\n";
+		f  << std::setw(p + 5) << it->getFrequency() << std::setw(p+5) << it->getDbAmplitude() << "\n";
 	}
 }
-void Mixer::addEvent(const MixerEvent & evt)
+void Mixer::addEvent(const MixerEvent* evt)
 {
-	events.emplace_back(evt);
+	events.emplace_back(std::make_shared<MixerEvent>(*evt));
+}
+
+void Mixer::addEvent(std::shared_ptr<MixerEvent> evt)
+{
+	events.push_back(evt);
 }
 
 void Mixer::clear()
 {
 	events.clear();
+}
+std::vector<std::shared_ptr<MixerEvent>>& Mixer::getEvents()
+{
+	return events;
 }
 std::vector<float> Mixer::getSamplesFromUntil(double tBegin, double tEnd, SDL_AudioSpec spec)
 {
@@ -116,7 +125,7 @@ Mixer::Mixer(std::string fileName)
 	while (f >> frq >> db)
 	{
 		MixerEvent evt(frq, pow(10, db / 10));
-		this->addEvent(evt);
+		this->addEvent(&evt);
 	}
 }
 
@@ -128,8 +137,8 @@ double Mixer::getSample(double t)
 	double maxAmplitude = 0;
 	for (auto& it : events)
 	{
-		sum += it.getValueAtTime(t);
-		maxAmplitude += it.getAmplitude();
+		sum += it->getValueAtTime(t);
+		maxAmplitude += it->getAmplitude();
 	}
 	return sum / maxAmplitude;
 }

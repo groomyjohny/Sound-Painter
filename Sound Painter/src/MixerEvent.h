@@ -15,6 +15,6 @@ public:
 	virtual void setFrequency(double frq);
 	virtual void setAmplitude(double amp);
 	virtual void setDbAmplitude(double dbAmp);
-private:
+protected:
 	double argMult, amplitude = 1;
 };

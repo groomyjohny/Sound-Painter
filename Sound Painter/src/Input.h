@@ -18,6 +18,7 @@ public:
 	bool isKeyboardButtonHeld(SDL_Scancode code);
 	bool isKeyboardButtonPressed(SDL_Scancode code); //will return true on the first frame after button is pressed and false otherwise
 	bool isMouseButtonHeld(Uint8 button);
+	bool isMouseButtonPressed(Uint8 button);
 
 	InputSnapshot previousSnapshot, currentSnapshot;
 	std::vector<SDL_Event> mouseEvents;

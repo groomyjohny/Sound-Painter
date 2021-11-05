@@ -46,5 +46,5 @@ void DrawMode::addPoint(int x, int y)
 	points.emplace_back(SDL_Point{ x, y });
 	double frq = exp(state->lnLow + double(x) / state->w * (state->lnHigh - state->lnLow));
 	double db = -state->dbFloor * double(y) / state->h;
-	mixer.addEvent(MixerEvent(frq, pow(10, db / 10)));
+	mixer.addEvent(&MixerEvent(frq, pow(10, db / 10)));
 }

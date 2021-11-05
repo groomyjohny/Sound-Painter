@@ -6,7 +6,7 @@ class HarmonicsMode : public ProgramMode
 public:
 	HarmonicsMode(ProgramState* state);
 	virtual void draw();
-private:
+protected:
 	HarmonicMixer mixer;
 
 	virtual void runIndividualEventHandler(SDL_Event& event); //default event handlers

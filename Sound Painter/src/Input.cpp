@@ -36,3 +36,8 @@ bool Input::isMouseButtonHeld(Uint8 button)
 {
 	return currentSnapshot.mouseButtonDown[button];
 }
+
+bool Input::isMouseButtonPressed(Uint8 button)
+{
+	return !previousSnapshot.mouseButtonDown[button] && currentSnapshot.mouseButtonDown[button];
+}

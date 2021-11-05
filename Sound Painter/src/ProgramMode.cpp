@@ -1,6 +1,7 @@
 #include "ProgramMode.h"
 #include <iostream>
 #include "HarmonicsMode.h"
+#include "WaveformMode.h"
 ProgramMode::ProgramMode(ProgramState* state)
 	:state(state)
 {
@@ -24,8 +25,12 @@ void ProgramMode::runOncePerFrameHandlers(std::vector<SDL_Event>& events)
 
 	if (inp.isKeyboardButtonPressed(SDL_SCANCODE_H))
 	{
-		//delete state->currentMode;
 		state->currentMode = new HarmonicsMode(state);
+	}
+
+	if (inp.isKeyboardButtonPressed(SDL_SCANCODE_W))
+	{
+		state->currentMode = new WaveformMode(state);
 	}
 
 	if (inp.isKeyboardButtonPressed(SDL_SCANCODE_ESCAPE)) exit(-1);
