@@ -15,9 +15,9 @@ void DrawMode::draw()
 	SDL_SetRenderDrawColor(state->rend, 255, 255, 255, SDL_ALPHA_OPAQUE);
 }
 
-void DrawMode::handleEvent(SDL_Event & event)
+void DrawMode::runIndividualEventHandler(SDL_Event & event)
 {
-	ProgramMode::handleEvent(event);
+	ProgramMode::runIndividualEventHandler(event);
 	
 	if (event.type == SDL_MOUSEMOTION)
 	{

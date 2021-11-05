@@ -13,7 +13,8 @@ public:
 	virtual std::vector<SDL_Event> pollAndHandleEvents(); //basic mode switching
 	virtual void draw() = 0;
 protected:
-	virtual void handleEvent(SDL_Event& event); //default event handlers
+	virtual void runOncePerFrameHandlers(std::vector<SDL_Event>& events);
+	virtual void runIndividualEventHandler(SDL_Event& event); //default event handlers
 	virtual void clear() = 0;
 	virtual void save() = 0;
 	virtual std::string generateNameBase();

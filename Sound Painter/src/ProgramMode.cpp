@@ -9,11 +9,12 @@ ProgramMode::ProgramMode(ProgramState* state)
 std::vector<SDL_Event> ProgramMode::pollAndHandleEvents()
 {
 	auto events = state->input.pollEvents();
-	for (auto& it : events) handleEvent(it);
+	runOncePerFrameHandlers(events);
+	for (auto& it : events) runIndividualEventHandler(it);
 	return events;
 }
 
-void ProgramMode::handleEvent(SDL_Event & event)
+void ProgramMode::runOncePerFrameHandlers(std::vector<SDL_Event>& events)
 {
 	auto& inp = state->input;
 	if (inp.isKeyboardButtonPressed(SDL_SCANCODE_B)) runBenchmark();
@@ -28,6 +29,10 @@ void ProgramMode::handleEvent(SDL_Event & event)
 	}
 
 	if (inp.isKeyboardButtonPressed(SDL_SCANCODE_ESCAPE)) exit(-1);
+}
+
+void ProgramMode::runIndividualEventHandler(SDL_Event & event)
+{
 	if (event.type == SDL_QUIT) exit(-1);
 }
 

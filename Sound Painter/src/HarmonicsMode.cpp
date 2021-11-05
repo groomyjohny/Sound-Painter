@@ -35,9 +35,9 @@ void HarmonicsMode::draw()
 	SDL_SetRenderDrawColor(state->rend, 255, 255, 255, SDL_ALPHA_OPAQUE);
 }
 
-void HarmonicsMode::handleEvent(SDL_Event & event)
+void HarmonicsMode::runIndividualEventHandler(SDL_Event & event)
 {
-	ProgramMode::handleEvent(event);
+	ProgramMode::runIndividualEventHandler(event);
 	if (state->input.isMouseButtonHeld(SDL_BUTTON_LEFT) && event.type == SDL_MOUSEMOTION)
 	{
 		this->setPoint(event.motion.x, event.motion.y);

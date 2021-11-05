@@ -9,7 +9,7 @@ public:
 private:
 	HarmonicMixer mixer;
 
-	virtual void handleEvent(SDL_Event& event); //default event handlers
+	virtual void runIndividualEventHandler(SDL_Event& event); //default event handlers
 	virtual void clear();
 	virtual void save();
 	virtual void setPoint(int x, int y);
