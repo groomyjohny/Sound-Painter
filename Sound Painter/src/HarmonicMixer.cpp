@@ -1,5 +1,5 @@
 #include "HarmonicMixer.h"
-
+#include <filesystem>
 HarmonicMixer::HarmonicMixer(int nHarmonics)
 {
 	this->nHarmonics = nHarmonics;
@@ -22,12 +22,18 @@ void HarmonicMixer::setHarmoicsCount(int n)
 
 void HarmonicMixer::saveSoundToFile(std::string fileName)
 {
+	size_t p0 = fileName.find_last_of('/');
 	size_t p1 = fileName.find('.');
+	
+	std::string baseName = fileName.substr(p0, p1 - p0);
+	std::string folderPath = fileName.substr(0, p1);
+	std::filesystem::create_directories(folderPath);
+
 	static std::string noteNames[] = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A","A#","B" };
 	for (int i = 0; i < 128; ++i)
 	{
 		std::string noteName = noteNames[i % 12] + std::to_string(i / 12 - 1);
-		std::string subname = fileName.substr(0, p1) + std::string(" ") + noteName +".wav";
+		std::string subname = folderPath + baseName + std::string(" ") + noteName +".wav";
 		setFundamentalFrequency(440 * pow(2, (i - 69) / 12.0));
 		Mixer::saveSoundToFile(subname);
 	}
