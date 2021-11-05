@@ -19,13 +19,17 @@ double LineCurve::getValueAtTime(double t)
 
 double LineCurve::getPreciseValueAtTime(double t)
 {
+	double l = segments.front().phaseBegin;
+	double h = segments.back().phaseEnd;
+
 	double acc = 0;
 	int div = 0;
 	double f = getFrequency();
-	double p = std::fmod(t, 1.0 / f)*f;
+	double truePhase = std::fmod(t, 1.0 / f)*f;
+	double stretchedPhase = l + truePhase*(h - l);
 	for (auto& it : segments)
 	{
-		double v = it.getValueAtPhase(p);
+		double v = it.getValueAtPhase(stretchedPhase);
 		acc += v;
 		if (v > 0) div++;
 	}
