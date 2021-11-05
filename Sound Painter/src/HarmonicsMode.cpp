@@ -26,15 +26,12 @@ void HarmonicsMode::draw()
 	while (it != bars.end())
 	{
 		r.x = it->first*harmonicWidth;
+		r.w = harmonicWidth;
 		r.y = it->second;
 		r.h = state->h - r.y;
 		rects.emplace_back(r);
 		++it;
 	}
-
-	for (int i = 0; i < rects.size()-1; ++i) rects[i].w = rects[i + 1].x - rects[i].x; //determine widths to avoid empty areas
-	if (rects.size() >= this->harmonicsCount) rects.back().w = state->w - rects.back().x; //if this harmonic is last, then stretch it to the edge of the screen
-	else rects.back().w = harmonicWidth; 
 
 	SDL_RenderDrawRects(state->rend, &rects.front(), rects.size());
 	SDL_SetRenderDrawColor(state->rend, 255, 255, 255, SDL_ALPHA_OPAQUE);
