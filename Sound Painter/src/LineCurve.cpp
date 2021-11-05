@@ -37,12 +37,13 @@ double LineCurve::getPreciseValueAtTime(double t)
 	return (acc / div * 2) - 1;
 }
 
-void LineCurve::addSegment(const LineSegment & seg)
+void LineCurve::addSegment(const LineSegment & seg, std::shared_ptr<std::mutex> mtx)
 {
+	std::lock_guard g(*mtx);
 	segments.emplace_back(seg);
 }
 
-void LineCurve::append(double phaseEnd, double ampEnd)
+void LineCurve::append(double phaseEnd, double ampEnd, std::shared_ptr<std::mutex> mtx)
 {
 	LineSegment seg;
 	bool e = segments.empty();
@@ -50,7 +51,7 @@ void LineCurve::append(double phaseEnd, double ampEnd)
 	seg.phaseEnd = phaseEnd;
 	seg.ampBegin = e ? ampEnd : segments.back().ampEnd;
 	seg.ampEnd = ampEnd;
-	addSegment(seg);
+	addSegment(seg, mtx);
 }
 
 const std::vector<LineSegment>& LineCurve::getSegments()

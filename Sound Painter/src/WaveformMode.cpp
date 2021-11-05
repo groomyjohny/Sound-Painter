@@ -89,5 +89,5 @@ void WaveformMode::addPoint(int x, int y)
 	//double db = -state->dbFloor*double(y) / state->h;
 	//double amp = pow(10, db / 10);
 	double amp = 1 - double(y) / state->h;
-	p->append(phase, amp);
+	p->append(phase, amp, mixer.getMutex());
 }
