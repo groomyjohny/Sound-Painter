@@ -27,20 +27,21 @@ void fill_audio_with_zeros(void *udata, Uint8 *stream, int len)
 }
 void fill_audio(void *udata, Uint8 *stream, int len)
 {
+	static double playbackTime = 0;
+
 	auto mode = state.currentMode;
 	if (!mode) return fill_audio_with_zeros(udata, stream, len);
 	auto mixer = mode->getMixer();
 	if (state.PLAYBACK_IS_MUTED || !mixer) return fill_audio_with_zeros(udata, stream, len);
 
-	double t = state.TIMER.getTime();
 	double cycleTime = 1.0 / state.AUDIO_BUFFER_RATE;	
 	auto m = mixer->getMutex();
 	std::lock_guard g(*m);
 
 	for (int i = 0; i < len/sizeof(float); ++i)
 	{
-		((float*)(stream))[i] = mixer ? mixer->getSample(t) : 0;
-		t += cycleTime;
+		((float*)(stream))[i] = mixer ? mixer->getSample(playbackTime) : 0;
+		playbackTime += cycleTime;
 	}
 }
 
