@@ -5,11 +5,10 @@
 #include <SDL\SDL.h>
 #include <string>
 #include <ctime>
+#include <memory>
 
-#include <adm/Timer.h>
 #include "Mixer.h"
 #include "Helpers.h"
-#include <memory>
 #include "HarmonicMixer.h"
 #include "ProgramState.h"
 #include "ProgramMode.h"
